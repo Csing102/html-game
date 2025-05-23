@@ -10,19 +10,40 @@ canvas.height = 480;
 let playerX = canvas.width / 2;
 let playerY = canvas.height - 50;
 let playerSpeed = 5;
+let playerRotation = 0;
 
 // Asteroid properties
 let asteroids = [];
 let asteroidSpeed = 2;
+
+// Level properties
+let currentLevel = 1;
+let levels = [
+    {asteroidCount: 5, asteroidSpeed: 2},
+    {asteroidCount: 10, asteroidSpeed: 3},
+    {asteroidCount: 15, asteroidSpeed: 4}
+];
+
+// Sound effects
+const explosionSound = document.getElementById('explosionSound');
+const laserSound = document.getElementById('laserSound');
 
 // Game loop
 function draw() {
     // Clear the canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    // Draw the background
+    ctx.fillStyle = 'black';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
     // Draw the player
+    ctx.save();
+    ctx.translate(playerX, playerY);
+    ctx.rotate(playerRotation);
     ctx.fillStyle = 'blue';
-    ctx.fillRect(playerX, playerY, 50, 50);
+    ctx.fillRect(-25, -25, 50, 50);
+    ctx.restore();
 
     // Move and draw asteroids
     for (let i = 0; i < asteroids.length; i++) {
@@ -32,6 +53,7 @@ function draw() {
 
         // Check for collision with player
         if (checkCollision(playerX, playerY, 50, 50, asteroids[i].x, asteroids[i].y, 30, 30)) {
+            explosionSound.play();
             alert('Game Over!');
             return;
         }
@@ -57,12 +79,23 @@ function draw() {
     if (leftPressed) {
         playerX -= playerSpeed;
     }
+    if (upPressed) {
+        playerY -= playerSpeed;
+    }
+    if (downPressed) {
+        playerY += playerSpeed;
+    }
 
     // Ensure the player doesn't move off the screen
     if (playerX < 0) {
         playerX = 0;
     } else if (playerX > canvas.width - 50) {
         playerX = canvas.width - 50;
+    }
+    if (playerY < 0) {
+        playerY = 0;
+    } else if (playerY > canvas.height - 50) {
+        playerY = canvas.height - 50;
     }
 
     // Request the next frame
@@ -80,6 +113,8 @@ function checkCollision(x1, y1, w1, h1, x2, y2, w2, h2) {
 // Key press variables
 let rightPressed = false;
 let leftPressed = false;
+let upPressed = false;
+let downPressed = false;
 
 // Key event listeners
 document.addEventListener('keydown', keyDownHandler);
@@ -90,6 +125,10 @@ function keyDownHandler(e) {
         rightPressed = true;
     } else if (e.key == 'Left' || e.key == 'ArrowLeft') {
         leftPressed = true;
+    } else if (e.key == 'Up' || e.key == 'ArrowUp') {
+        upPressed = true;
+    } else if (e.key == 'Down' || e.key == 'ArrowDown') {
+        downPressed = true;
     }
 }
 
@@ -98,7 +137,43 @@ function keyUpHandler(e) {
         rightPressed = false;
     } else if (e.key == 'Left' || e.key == 'ArrowLeft') {
         leftPressed = false;
+    } else if (e.key == 'Up' || e.key == 'ArrowUp') {
+        upPressed = false;
+    } else if (e.key == 'Down' || e.key == 'ArrowDown') {
+        downPressed = false;
     }
+}
+
+// Restart button event listener
+document.getElementById('restartButton').addEventListener('click', restartGame);
+
+function restartGame() {
+    playerX = canvas.width / 2;
+    playerY = canvas.height - 50;
+    asteroids = [];
+    currentLevel = 1;
+    asteroidSpeed = 2;
+}
+
+// Reload button event listener
+document.getElementById('reloadButton').addEventListener('click', reloadGame);
+
+function reloadGame() {
+    location.reload();
+}
+
+// Pause button event listener
+document.getElementById('pauseButton').addEventListener('click', pauseGame);
+
+function pauseGame() {
+    cancelAnimationFrame(draw);
+}
+
+// Play button event listener
+document.getElementById('playButton').addEventListener('click', playGame);
+
+function playGame() {
+    draw();
 }
 
 // Start the game loop
