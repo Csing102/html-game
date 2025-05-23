@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Asteroids Game</title>
+    <title>3D Asteroids Game</title>
     <style>
         /* Add some basic styling to our game */
         canvas {
@@ -12,6 +12,12 @@
 </head>
 <body>
 <canvas id="gameCanvas" width="640" height="480"></canvas>
+<audio id="explosionSound" src="explosion.mp3"></audio>
+<audio id="laserSound" src="laser.mp3"></audio>
+<button id="restartButton">Restart</button>
+<button id="reloadButton">Reload</button>
+<button id="pauseButton">Pause</button>
+<button id="playButton">Play</button>
 <script src="game.js"></script>
 </body>
 </html>
